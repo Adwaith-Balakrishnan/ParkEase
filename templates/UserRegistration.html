@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>User Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="login-page">
+    <div class="container">
+        <h1 class="text-center mb-5">User Registration</h1>
+
+        <form class="row g-3 mx-auto" action="/User/registration" method="POST" id="userregister"
+            style="max-width: 600px;">
+
+            <div class="col-md-12">
+                <label for="inputEmail4" class="form-label">Email</label>
+                <input type="email" class="form-control" id="inputEmail4" name="email_id" required>
+                {% with messages = get_flashed_messages(category_filter=["email_error"]) %}
+                {% if messages %}
+                <div class="text-danger small">{{ messages[0] }}</div>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <div class="col-md-12">
+                <label for="inputUsername" class="form-label">Username</label>
+                <input type="text" class="form-control" id="inputUsername" name="username" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="inputPassword4" class="form-label">Password</label>
+                <input type="password" class="form-control" id="inputPassword4" name="password" required>
+            </div>
+
+            <div class="col-md-6">
+                <label for="inputConfirmPassword4" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="inputConfirmPassword4" name="confirm_password" required>
+                {% with messages = get_flashed_messages(category_filter=["confirm_pw_error"]) %}
+                {% if messages %}
+                <div class="text-danger small">{{ messages[0] }}</div>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <div class="col-12">
+                <label for="inputPhoneno" class="form-label">Phone number</label>
+                <input type="text" class="form-control" id="inputPhoneno" name="phone_no" required>
+                {% with messages = get_flashed_messages(category_filter=["phone_error"]) %}
+                {% if messages %}
+                <div class="text-danger small">{{ messages[0] }}</div>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <div class="col-12">
+                <label for="inputAddress" class="form-label">Address</label>
+                <input type="text" class="form-control" id="inputAddress" name="address" required>
+            </div>
+
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary w-100">Register</button>
+            </div>
+
+            <div class="col-12 text-center">
+                <a href="/User/login">Already have an account?</a>
+            </div>
+
+        </form>
+    </div>
+</body>
+
+</html>

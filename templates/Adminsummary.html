@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        html,
+        body {
+            height: auto;
+            min-height: 120vh;
+            overflow-y: auto;
+        }
+
+        body {
+            padding-bottom: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg" style="background-color: #71aded;">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Admin</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Admin/Home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Admin/Users">Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Admin/Search">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="/Admin/Summary">Summary</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Admin/EditProfile">Edit Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-danger ms-2" href="/User/login">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+
+        <h2 class="text-center mb-3">Revenue Distribution by Parking Lot</h2>
+        <div style="display: flex; justify-content: center; align-items: center; gap: 30px;">
+            <div style="width: 400px; height: 400px; flex-shrink: 0;">
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div id="pieLegend" style="max-height: 350px; overflow-y: auto; padding: 10px; min-width: 200px;"></div>
+        </div>
+
+        <h2 class="text-center mt-5 mb-3">Occupied vs Available Spots</h2>
+        <canvas id="barChart" width="800" height="500" style="margin: 0 auto;"></canvas>
+        <div style="height: 100px;"></div>
+
+    </div>
+
+    <script>
+        const pieLabels = {{ revenue | map(attribute = 'lot_area') | list | tojson }};
+        const pieValues = {{ revenue | map(attribute = 'revenue') | list | tojson }};
+        const pieColors = ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#8BC34A", "#E91E63",
+            "#00BCD4", "#795548", "#607D8B", "#CDDC39", "#FF5722", "#3F51B5", "#009688", "#FFC107"];
+
+        const pieChart = new Chart("pieChart", {
+            type: "pie",
+            data: {
+                labels: pieLabels,
+                datasets: [{
+                    backgroundColor: pieColors,
+                    data: pieValues
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: "Revenue from Each Parking Lot"
+                    }
+                }
+            }
+        });
+
+        const legendDiv = document.getElementById("pieLegend");
+        pieLabels.forEach((label, i) => {
+            const item = document.createElement("div");
+            item.style.cssText = "display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;";
+            const box = document.createElement("span");
+            box.style.cssText = `width:14px; height:14px; border-radius:3px; flex-shrink:0; background:${pieColors[i % pieColors.length]}`;
+            const text = document.createElement("span");
+            text.style.cssText = "font-size:14px;";
+            text.textContent = label;
+            item.appendChild(box);
+            item.appendChild(text);
+            legendDiv.appendChild(item);
+        });
+
+        const barLabels = {{ spot_status | map(attribute = 'lot_area') | list | tojson }};
+        const available = {{ spot_status | map(attribute = 'available') | list | tojson }};
+        const occupied = {{ spot_status | map(attribute = 'occupied') | list | tojson }};
+
+        new Chart("barChart", {
+            type: "bar",
+            data: {
+                labels: barLabels,
+                datasets: [
+                    {
+                        label: "Available Spots",
+                        backgroundColor: "#36A2EB",
+                        data: available
+                    },
+                    {
+                        label: "Occupied Spots",
+                        backgroundColor: "#FF6384",
+                        data: occupied
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: "Available vs Occupied Spots per Lot"
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
